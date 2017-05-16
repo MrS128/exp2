@@ -1,0 +1,161 @@
+
+<link rel="import" href="./bower_components/polymer/polymer-element.html">
+
+
+<link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Cutive+Mono|Gloria+Hallelujah|Happy+Monkey|Love+Ya+Like+A+Sister|Roboto+Mono|Ubuntu+Mono" rel="stylesheet">
+
+<!--
+`simple-clock`
+A simple test element
+
+@demo demo/index.html
+-->
+
+<!-- Two fonts below are local (which is good), but not used for the moment. Use an example later. -->
+<style>
+      @font-face {
+        font-family: Repet;
+        src: url(./css/Repet.ttf) format("truetype");   
+      }
+
+      @font-face {
+        font-family: "Pennstat";
+        src: url(./css/Pennstat.ttf) format("truetype");   
+      }
+</style>      
+
+<dom-module id="simple-clock">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+        padding: 5px;
+      }
+
+      #wrapper {
+        width: 100%;
+        
+      } 
+
+      #display {
+        line-height: 100px;
+        font-size: 12.5vw;
+        font-family: 'Roboto Mono', monospace;
+        white-space: nowrap;
+        
+        /* 
+        font-family: 'Roboto Mono', monospace;
+        font-family: 'Love Ya Like A Sister', cursive;
+        font-family: 'Gloria Hallelujah', cursive;
+        font-family: 'Ubuntu Mono', monospace;
+        font-family: 'Cutive Mono', monospace;
+        */
+        
+        
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        text-align: center;
+      }
+
+      
+    </style>
+
+    <div id="wrapper">
+      <div id="display" on-click="handleClick">{{timeStr}}</div>
+    </div>
+  </template>
+
+  <script>
+    /** @polymerElement */
+    
+    class SimpleClock extends Polymer.Element {
+      static get is() { return 'simple-clock'; }
+      static get properties() {
+        return {
+          timeStr: {
+            type: String,
+            notify: true
+          },
+          height: {
+            type: String,
+            notify: true,
+            value: '100px',
+            observer: '_heightChanged'
+          }
+        };
+      }
+
+      _heightChanged(newValue, oldValue) {
+        console.log("Change height from: "+this.$.display.style.height+" to "+newValue);
+        this.$.display.style.lineHeight = newValue;
+        this.$.display.style.height = newValue;
+      }
+
+      handleClick() {
+        this.height = parseInt(this.height) * 2 + 'px';
+      }
+
+      constructor() {
+        super();
+        this.timeStr = this._getFormattedTimeStr();
+      } 
+
+      ready() {
+        super.ready();
+
+        setInterval(function() {
+          this.timeStr = this._getFormattedTimeStr();
+        }.bind(this), 1000);
+      }
+
+      _getFormattedTimeStr() {
+        var d = new Date();
+        return d.toLocaleTimeString(); 
+      }
+
+      // Not needed any more, but tested. Should be registered as "resize" event in connectedCallback()
+      /*
+      _updateFontSize() {
+        var 
+            w = getTextWidth(this.timeStr, "1px 'Roboto Mono', monospace"),
+            h = 1.3,
+            d = this.$.display,
+            pl = parseInt(getComputedStyle(d).paddingLeft),
+            pr = parseInt(getComputedStyle(d).paddingRight),
+            pt = parseInt(getComputedStyle(d).paddingTop),
+            pb = parseInt(getComputedStyle(d).paddingBottom),
+            dw = d.offsetWidth - pl - pr,
+            dh = d.offsetHeight - pt - pb,
+            fs = Math.round(Math.min(dw / w, dh / h));
+
+          this.$.display.style.fontSize = fs+'px';
+
+          console.log('Size: ' + this.$.display.offsetWidth + ' x ' + this.$.display.offsetHeight + ', Font: '+fs);
+      }
+      */
+    }
+    
+    // Not needed any more, but tested.
+    /*
+    function getTextWidth(text, font) {
+      // re-use canvas object for better performance
+      var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+      var context = canvas.getContext("2d");
+      context.font = font;
+      var metrics = context.measureText(text);
+      return metrics.width;
+    }
+    */
+
+    function getTextHeight(text, font) {
+      var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+      var context = canvas.getContext("2d");
+      context.font = font;
+      var metrics = context.measureText(text);
+      return metrics.emHeightAscent;
+    }
+
+    window.customElements.define(SimpleClock.is, SimpleClock);
+  </script>
+</dom-module>
